@@ -21,3 +21,19 @@ or just download the source code
 venv -m venv venv
 pip install -r requirements.txt
 ```
+
+#### Environment
+
+Create `.env` file and save it next to the `main.py`
+
+Create a variable
+
+```
+LOGIN_SERVER = <change this to web login page>
+```
+
+#### Save account to yaml
+
+Remove `.example` from accounts.yaml.example
+
+Put your email and password, multiple accounts supported
