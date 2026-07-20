@@ -128,10 +128,25 @@ class AutoPresence():
         await self.accounting(account)
 
     async def accounting(self, accounts:dict):
+        stats = []
         for email, password in accounts.items():
-            await self.simulation(email, password)
+            acc = await self.simulation(email, password)
+            stats.append(acc)
+
+        for account in stats:
+            menu_header()
+            msg = f"{account["account"]} successfully fulfilled the presence.\n" if account["success"] is True else f"{account["account"]} failed to fulfilled the presence.\n    {account["logs"]}"
+            print(msg)
+        
+        input("\nPress enter to continue.")
 
     async def simulation(self, email, password):
+        status = {
+            "success": False,
+            "account": email,
+            "password": password,
+        }
+
         async with Chrome() as browser:
             tab = await browser.start()
             await browser.set_window_maximized()
@@ -158,8 +173,8 @@ class AutoPresence():
             )
 
             if error_element:
-                print(f"Login Failed for {email}: Invalid credentials.")
-                return False
+                status["logs"] = f"Login Failed. Invalid credentials."
+                return status
 
             try:
                 presence_button = await tab.find(tag_name="button", type="button", data_bs_target="#modalPresensi")
@@ -173,12 +188,19 @@ class AutoPresence():
                 presence_submit = await tab.find(xpath="//button[contains(., 'Simpan Presensi')]")
                 await presence_submit.click(humanize=True)
 
+                status["success"] = True
+
             except:
+                status["logs"] = f"This account has checked in today, please try again later."
                 pass
+
+            await asyncio.sleep(1)
+
+            await tab.close()
 
             print("Presence has been checked.")
             traceback.print_exc
-            return
+            return status
 
     async def program_exit(self):
         print("Exiting program...")
