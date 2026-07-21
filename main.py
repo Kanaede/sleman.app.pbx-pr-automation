@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import asyncio
 import traceback
 import os
@@ -10,8 +12,11 @@ from pydoll.browser.chromium import Chrome
 
 load_dotenv()
 
+WORK_DIR = os.path.dirname(os.path.abspath(__file__))
+account_dir = os.path.join(WORK_DIR, 'data/accounts.yaml')
+
 def get_accounts():
-    with open("data/accounts.yaml", "r") as file:
+    with open(account_dir, "r") as file:
         return yaml.safe_load(file)
 
 def clr_screen():
@@ -133,8 +138,8 @@ class AutoPresence():
             acc = await self.simulation(email, password)
             stats.append(acc)
 
+        menu_header()
         for account in stats:
-            menu_header()
             msg = f"{account["account"]} successfully fulfilled the presence.\n" if account["success"] is True else f"{account["account"]} failed to fulfilled the presence.\n    {account["logs"]}"
             print(msg)
         
